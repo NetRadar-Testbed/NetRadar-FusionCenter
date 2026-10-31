@@ -1,0 +1,75 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, or a testbed built with it, in published work,
+  please cite the papers below and state that your testbed was built using
+  the NetRadar open-source software (including the version you used).
+title: "NetRadar-FusionCenter: fusion center for the NetRadar networked mmWave radar testbed"
+abstract: >-
+  Fusion center of NetRadar, a networked mmWave radar testbed: MQTT broker,
+  time-sync ticks for hardware-triggered nodes, on-demand multi-node
+  self-calibration, a live dashboard and a PostgreSQL store, run with Docker
+  Compose. Developed as part of the Chirp Capstone Project 2025-2026,
+  University of California, Santa Barbara.
+type: software
+license: Apache-2.0
+repository-code: "https://github.com/NetRadar-Testbed/NetRadar-FusionCenter"
+url: "https://netradar-testbed.github.io"
+keywords:
+  - mmWave radar
+  - radar network
+  - self-calibration
+  - radar fusion
+  - testbed
+authors:
+  - given-names: William
+    family-names: Ni
+  - given-names: Oviya
+    family-names: Seeniraj
+  - given-names: Andrey
+    family-names: Otvagin
+  - given-names: Vihan
+    family-names: Jayaraman
+  - given-names: Jason
+    family-names: Wang
+  - given-names: Anirban
+    family-names: Banik
+preferred-citation:
+  type: conference-paper
+  title: "mmSnap: Bayesian One-Shot Fusion in a Self-Calibrated mmWave Radar Network"
+  authors:
+    - given-names: Anirban
+      family-names: Banik
+    - given-names: Lalitha
+      family-names: Giridhar
+    - given-names: Aaditya Prakash
+      family-names: Kattekola
+    - given-names: Anurag
+      family-names: Pallaprolu
+    - given-names: Yasamin
+      family-names: Mostofi
+    - given-names: Ashutosh
+      family-names: Sabharwal
+    - given-names: Upamanyu
+      family-names: Madhow
+  collection-title: "2025 IEEE Radar Conference (RadarConf25)"
+  year: 2025
+  start: 1116
+  end: 1121
+  doi: "10.1109/RadarConf2559087.2025.11205142"
+references:
+  - type: conference-paper
+    title: "Optimal Self-Calibration for Collaborative Sensing in mmWave Radar Networks"
+    authors:
+      - given-names: Anirban
+        family-names: Banik
+      - given-names: Yasamin
+        family-names: Mostofi
+      - given-names: Ashutosh
+        family-names: Sabharwal
+      - given-names: Upamanyu
+        family-names: Madhow
+    collection-title: "2024 58th Asilomar Conference on Signals, Systems, and Computers"
+    year: 2024
+    start: 218
+    end: 222
+    doi: "10.1109/IEEECONF60004.2024.10942741"

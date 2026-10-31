@@ -1,0 +1,10 @@
+# Keep LF line endings everywhere: shell scripts and systemd units must not
+# get Windows CRLF endings, even when the repo is cloned on Windows.
+* text=auto eol=lf
+
+*.so* binary
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary

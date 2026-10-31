@@ -1,0 +1,43 @@
+NetRadar-FusionCenter
+Part of NetRadar, a networked mmWave radar testbed.
+https://github.com/NetRadar-Testbed
+
+Developed as part of the Chirp Capstone Project 2025-2026,
+University of California, Santa Barbara.
+
+Authors:             William Ni, Oviya Seeniraj, Andrey Otvagin,
+                     Vihan Jayaraman, Jason Wang, Anirban Banik
+Mentor:              Anirban Banik
+Advising professors: Upamanyu Madhow, Yogananda Isukapalli
+
+-------------------------------------------------------------------------------
+Citation request
+
+If you use this software, or a testbed built with it, in published work,
+please cite the following papers AND state that your testbed was built using
+the NetRadar open-source software (https://github.com/NetRadar-Testbed),
+including the version you used.
+
+  [1] A. Banik, L. Giridhar, A. P. Kattekola, A. Pallaprolu, Y. Mostofi,
+      A. Sabharwal and U. Madhow, "mmSnap: Bayesian One-Shot Fusion in a
+      Self-Calibrated mmWave Radar Network," 2025 IEEE Radar Conference
+      (RadarConf25), pp. 1116-1121, 2025.
+      doi:10.1109/RadarConf2559087.2025.11205142
+
+  [2] A. Banik, Y. Mostofi, A. Sabharwal and U. Madhow, "Optimal
+      Self-Calibration for Collaborative Sensing in mmWave Radar Networks,"
+      2024 58th Asilomar Conference on Signals, Systems, and Computers,
+      pp. 218-222, 2024. doi:10.1109/IEEECONF60004.2024.10942741
+
+Suggested acknowledgement sentence:
+  "The radar testbed used in this work was built with the open-source
+   NetRadar software [1, 2] (https://github.com/NetRadar-Testbed, version X)."
+
+BibTeX entries: CITATION.cff and https://netradar-testbed.github.io/citing/
+
+-------------------------------------------------------------------------------
+Third-party software
+
+The Docker images (NanoMQ, PostgreSQL, Python) and Python packages this
+project uses are downloaded at build time and keep their own licences; see
+THIRD_PARTY_NOTICES.md.

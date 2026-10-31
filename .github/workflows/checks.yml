@@ -1,0 +1,57 @@
+# Runs on every pull request and on pushes to main. Make "secret-scan",
+# "python", "shell" and "compose" required status checks in the main-branch
+# ruleset.
+name: checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  secret-scan:
+    name: secret-scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: gitleaks (full history)
+        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.30.1 git --redact --verbose /repo
+
+  python:
+    name: python
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Byte-compile all Python sources
+        run: python -m compileall -q bridge calibration dashboard timesync
+
+  shell:
+    name: shell
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax-check shell scripts
+        run: git ls-files '*.sh' | xargs -r -n1 bash -n
+
+  compose:
+    name: compose
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Refuses to start without setup.sh
+        run: |
+          if docker compose config -q 2>/dev/null; then
+            echo "compose accepted a configuration without passwords"; exit 1
+          fi
+      - name: Valid with generated configuration
+        run: |
+          ./setup.sh --nodes 2 --bind-ip 127.0.0.1 --host ci-fusion-center
+          docker compose config -q

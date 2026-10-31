@@ -1,0 +1,133 @@
+# NetRadar fusion center.
+#
+# Run ./setup.sh first: it writes .env (random passwords, the address to listen
+# on) and the broker's per-user password files in nanomq/auth/. Compose refuses
+# to start while any required value is missing.
+#
+# Exposure: the MQTT broker (1883) and dashboard (5002) listen only on
+# NETRADAR_BIND_IP (setup.sh uses this machine's Tailscale IP). PostgreSQL is
+# reachable only from this machine (127.0.0.1:5432).
+
+x-mqtt-env: &mqtt-env
+    MQTT_HOST: nanomq
+    MQTT_PORT: "1883"
+    MQTT_USER: ${MQTT_SERVER_USER:-server}
+    MQTT_PASS: ${MQTT_SERVER_PASS:?run ./setup.sh first}
+    NETRADAR_TOPIC_PREFIX: ${NETRADAR_TOPIC_PREFIX:-netradar/v1}
+
+x-db-env: &db-env
+    DB_HOST: postgres
+    DB_PORT: "5432"
+    DB_NAME: ${POSTGRES_DB:-netradar}
+    DB_USER: ${POSTGRES_USER:-netradar}
+    DB_PASS: ${POSTGRES_PASSWORD:?run ./setup.sh first}
+
+x-logging: &default-logging
+    driver: "json-file"
+    options:
+        max-size: "10m"
+        max-file: "3"
+
+services:
+    # ── MQTT broker (NanoMQ) ──────────────────────────────────────────
+    nanomq:
+        image: emqx/nanomq:0.25.6
+        container_name: netradar-nanomq
+        restart: unless-stopped
+        ports:
+            - "${NETRADAR_BIND_IP:?run ./setup.sh first}:1883:1883" # MQTT TCP
+        volumes:
+            - ./nanomq/nanomq.conf:/etc/nanomq.conf:ro
+            - ./nanomq/auth:/etc/nanomq/auth:ro
+        healthcheck:
+            test: ["CMD", "nanomq_cli", "ping"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    # ── PostgreSQL (message store) ─────────────────────────────────────
+    postgres:
+        image: postgres:16-alpine
+        container_name: netradar-postgres
+        restart: unless-stopped
+        ports:
+            - "127.0.0.1:5432:5432" # local tools only, never the network
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER:-netradar}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?run ./setup.sh first}
+            POSTGRES_DB: ${POSTGRES_DB:-netradar}
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+            - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+        healthcheck:
+            test:
+                [
+                    "CMD-SHELL",
+                    "pg_isready -U ${POSTGRES_USER:-netradar} -d ${POSTGRES_DB:-netradar}",
+                ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    # ── Bridge: subscribes to MQTT topics and inserts into Postgres ────
+    bridge:
+        build: ./bridge
+        container_name: netradar-bridge
+        restart: unless-stopped
+        depends_on:
+            nanomq:
+                condition: service_healthy
+            postgres:
+                condition: service_healthy
+        environment:
+            <<: [*mqtt-env, *db-env]
+        logging: *default-logging
+
+    # ── Time-sync: periodic capture/start ticks (every 10 s) ───────────
+    timesync:
+        build: ./timesync
+        container_name: netradar-timesync
+        restart: unless-stopped
+        depends_on:
+            nanomq:
+                condition: service_healthy
+        environment:
+            <<: *mqtt-env
+            NETRADAR_LEAD_TIME_MS: "5000"
+            NETRADAR_SYNC_INTERVAL_S: "10"
+            NETRADAR_SYNC_GROUPS: "default"
+        logging: *default-logging
+
+    # ── Calibration: orchestrates multi-node self-calibration ──────────
+    calibration:
+        build: ./calibration
+        container_name: netradar-calibration
+        restart: unless-stopped
+        depends_on:
+            nanomq:
+                condition: service_healthy
+            postgres:
+                condition: service_healthy
+        environment:
+            <<: [*mqtt-env, *db-env]
+        logging: *default-logging
+
+    # ── Dashboard: multi-node bird's-eye x-y plot and node controls ───
+    # No login: anyone who can reach this port can control the testbed, so
+    # it is bound to NETRADAR_BIND_IP (your tailnet) only.
+    dashboard:
+        build: ./dashboard
+        container_name: netradar-dashboard
+        restart: unless-stopped
+        ports:
+            - "${NETRADAR_BIND_IP:?run ./setup.sh first}:5002:5002"
+        depends_on:
+            nanomq:
+                condition: service_healthy
+        environment:
+            <<: *mqtt-env
+            DASHBOARD_PORT: "5002"
+        logging: *default-logging
+
+volumes:
+    pgdata:
