@@ -8,9 +8,9 @@ live bird's-eye dashboard, and a PostgreSQL store — all as Docker containers.
 - **Radar nodes:** [NetRadar-Node](https://github.com/NetRadar-Testbed/NetRadar-Node)
 - **Full documentation:** <https://netradar-testbed.github.io>
 
-> NetRadar is built to be set up **from scratch on your own network**. Nothing in
-> this repository points at any existing deployment: `setup.sh` generates fresh
-> random passwords on your machine, and you create your own Tailscale network.
+With this repository and NetRadar-Node you can build a complete testbed of your
+own. `setup.sh` creates fresh passwords for the fusion center and every node, so
+you're up and running in a few commands.
 
 ## Architecture
 
@@ -89,18 +89,6 @@ All of these are git-ignored and readable only by you:
 Re-running `setup.sh` keeps existing passwords. `--force` regenerates all of
 them (then reconfigure every node).
 
-## Security model
-
-- **Network:** the broker (1883) and dashboard (5002) listen only on this
-  machine's Tailscale address; PostgreSQL only on `127.0.0.1`. Use a tailnet
-  that only you (and your collaborators) control.
-- **Dashboard has no login.** Anyone who can open it can start/stop nodes and
-  run calibration — that is why it is reachable only from your tailnet.
-- **Credentials:** every node has its own MQTT password; nothing has a default
-  password, and Compose refuses to start until `setup.sh` has run.
-- MQTT traffic is not TLS-encrypted by the broker; Tailscale encrypts it in
-  transit between devices.
-
 ## Services in detail
 
 ### timesync
@@ -126,7 +114,7 @@ that cluster, as `[range_m, doppler_mps, angle_rad]`. Noise points are not sent.
 
 <p align="center">
   <img src="docs/images/self-calibration-approach.png" width="620" alt="Diagram: four radars with overlapping fields of view tracking walking people; pairwise self-calibration between radars, then network averaging"><br>
-  <em>Self-calibration: pairs of radars that see the same people moving estimate their relative position and orientation (pairwise self-calibration), and the estimates are combined across the network (network averaging).</em>
+  <em>Radars that see the same people walking can work out where they are relative to each other. NetRadar does this for each pair of radars, then combines the results across the whole network.</em>
 </p>
 
 Calibration is decoupled from the nodes: nodes always stream live frames, and
@@ -143,15 +131,18 @@ the calibration service never asks them to collect special data.
 5. The result is published to `netradar/v1/group/<gid>/calibration/result` and
    stored in Postgres.
 
-<p align="center">
-  <img src="docs/images/outdoor-deployment.jpg" width="620" alt="Outdoor courtyard with three radars on tripods, labelled Radar 1 in the foreground and Radars 2 and 3 in the distance"><br>
-  <em>Outdoor three-radar deployment (at UC Santa Barbara)…</em>
-</p>
-
-<p align="center">
-  <img src="docs/images/self-calibration-demo.gif" width="620" alt="Animation: first each radar's tracks in its own coordinates, then the three radars' estimated positions and orientations with the same people aligned across radars"><br>
-  <em>…and self-calibration on it: first each radar's tracks in its own coordinates, then the estimated radar positions and orientations (Radar 1 as reference) with the same people aligned across all three radars.</em>
-</p>
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="docs/images/outdoor-deployment.jpg" width="100%" alt="Three radars on tripods in a courtyard, labelled Radar 1 in front and Radars 2 and 3 in the distance"><br>
+      <em>The setup: three radars in a courtyard at UC Santa Barbara.</em>
+    </td>
+    <td width="50%" align="center">
+      <img src="docs/images/self-calibration-demo.gif" width="100%" alt="Animation: each radar's tracks in its own coordinates, then the radars' estimated positions and orientations with the tracks lined up"><br>
+      <em>Each radar starts out seeing people in its own coordinates. Calibration finds where every radar is and which way it faces, and the tracks line up.</em>
+    </td>
+  </tr>
+</table>
 
 The method is described in the papers listed under *Citing NetRadar*.
 
@@ -224,10 +215,8 @@ LIMIT 20;
 
 ## Citing NetRadar
 
-If you use this software, or a testbed built with it, in published work, please
-cite the papers below **and** state that your testbed was built using the
-NetRadar open-source software (with the version). See `NOTICE` and
-<https://netradar-testbed.github.io/citing/>.
+**Using NetRadar in your research?** Please cite our papers, and mention in your
+paper that your testbed was built with NetRadar.
 
 ```bibtex
 @INPROCEEDINGS{11205142,
@@ -246,6 +235,12 @@ NetRadar open-source software (with the version). See `NOTICE` and
   pages={218-222},
   doi={10.1109/IEEECONF60004.2024.10942741}}
 ```
+
+## Contributing
+
+Contributions are welcome! Please fork the repository, make your changes on a branch
+and open a pull request against `main`. More details in
+[CONTRIBUTING.md](https://github.com/NetRadar-Testbed/.github/blob/main/CONTRIBUTING.md).
 
 ## Credits
 

@@ -13,10 +13,9 @@ Advising professors: Upamanyu Madhow, Yogananda Isukapalli
 -------------------------------------------------------------------------------
 Citation request
 
-If you use this software, or a testbed built with it, in published work,
-please cite the following papers AND state that your testbed was built using
-the NetRadar open-source software (https://github.com/NetRadar-Testbed),
-including the version you used.
+Using NetRadar in your research? Please cite our papers, and mention in your
+paper that your testbed was built with NetRadar
+(https://github.com/NetRadar-Testbed).
 
   [1] A. Banik, L. Giridhar, A. P. Kattekola, A. Pallaprolu, Y. Mostofi,
       A. Sabharwal and U. Madhow, "mmSnap: Bayesian One-Shot Fusion in a

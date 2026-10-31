@@ -1,8 +1,7 @@
 cff-version: 1.2.0
 message: >-
-  If you use this software, or a testbed built with it, in published work,
-  please cite the papers below and state that your testbed was built using
-  the NetRadar open-source software (including the version you used).
+  Using NetRadar in your research? Please cite our papers, and mention in your
+  paper that your testbed was built with NetRadar.
 title: "NetRadar-FusionCenter: fusion center for the NetRadar networked mmWave radar testbed"
 abstract: >-
   Fusion center of NetRadar, a networked mmWave radar testbed: MQTT broker,
